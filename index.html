@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C.P.A - Orientador Académico</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --bg: #19242e;
+            --white: #724141;
+            --gray: #bdc3c7;
+            --success: #27ae60;
+            --warning: #f1c40f;
+            --danger: #e74c3c;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: white; scroll-behavior: smooth; }
+
+        /* --- LANDING PAGE --- */
+        #landing-page {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; text-align: center; padding: 20px;
+            background: linear-gradient(rgba(25, 36, 46, 0.85), rgba(25, 36, 46, 0.85)), url('https://images.unsplash.com/photo-1523050335392-9bc567597280?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover; background-position: center;
+        }
+        .hero-title { font-size: 4rem; margin-bottom: 20px; color: var(--accent); font-weight: 800; letter-spacing: 2px; }
+        .hero-subtitle { font-size: 1.4rem; margin-bottom: 40px; max-width: 700px; line-height: 1.6; font-weight: 300; }
+        
+        .btn-start {
+            background: var(--success); color: white; padding: 20px 60px; border-radius: 50px;
+            font-weight: bold; font-size: 1.3rem; border: none; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4); text-transform: uppercase;
+        }
+        .btn-start:hover { transform: scale(1.05); background: #2ecc71; }
+
+        /* --- SISTEMA --- */
+        #sistema-cpa { display: none; }
+        header { background: var(--white); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .logo { font-weight: bold; color: var(--primary); font-size: 1.2rem; }
+        
+        .side-menu { position: fixed; right: -320px; top: 0; width: 320px; height: 100%; background: var(--primary); color: white; transition: 0.3s; z-index: 1001; padding-top: 20px; display: flex; flex-direction: column; }
+        .side-menu.active { right: 0; }
+        .close-menu { align-self: flex-end; margin-right: 20px; font-size: 2rem; cursor: pointer; }
+        .menu-content { padding: 20px; overflow-y: auto; flex: 1; }
+
+        .student-item { 
+            background: rgba(255,255,255,0.05); padding: 12px; margin-bottom: 8px; border-radius: 6px; 
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s;
+        }
+        .student-item:hover { background: rgba(255,255,255,0.15); }
+        .btn-del-small { background: var(--danger); border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.7rem; }
+
+        main { padding: 2rem 5%; max-width: 1100px; margin: 0 auto; width: 90%; }
+        .card { background: var(--white); padding: 2.5rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        h1 { text-align: center; color: var(--primary); margin-bottom: 2rem; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; background: #fff; color: #333; border-radius: 8px; overflow: hidden; }
+        th, td { border: 1px solid #690e5e; padding: 12px; text-align: center; }
+        th { background: #16b877; color: #fff; }
+        .input-nota { width: 55px; padding: 8px; text-align: center; border: 1px solid var(--gray); border-radius: 4px; font-weight: bold; }
+        .input-nota.negativa { color: var(--danger); background: #fff5f5; }
+
+        .btn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 20px; }
+        .btn { border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; color: white; text-transform: uppercase; font-size: 0.85rem; transition: 0.2s; }
+        .btn-calc { background: var(--accent); }
+        .btn-save { background: var(--success); }
+        .btn-pdf { background: var(--warning); color: #333; }
+        .btn-clear { background: #95a5a6; }
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        #resultado { display: none; margin-top: 30px; padding: 25px; background: #2b506f; border-radius: 12px; border-left: 8px solid var(--accent); }
+        .chart-container { background: white; padding: 20px; border-radius: 10px; margin-top: 20px; }
+        
+        footer { background: var(--primary); text-align: center; padding: 2rem; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+    <section id="landing-page">
+        <h1 class="hero-title">SISTEMA C.P.A</h1>
+        <p class="hero-subtitle">
+            Plataforma avançada de orientação vocacional inteligente.<br>
+            Analise o desempenho da 8ª, 9ª e 10ª classe para definir o melhor percurso académico.
+        </p>
+        <button class="btn-start" onclick="iniciarApp()">ENTRAR NO SISTEMA</button>
+    </section>
+
+    <div id="sistema-cpa">
+        <div id="sideMenu" class="side-menu">
+            <span class="close-menu" onclick="toggleMenu()">&times;</span>
+            <div class="menu-content">
+                <h3 style="border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px;">Histórico de Alunos</h3>
+                <div id="listaDinamica"></div>
+                <button class="btn" style="background:var(--danger); width:100%; margin-top:30px;" onclick="apagarTudo()">Limpar Tudo</button>
+            </div>
+        </div>
+
+        <header>
+            <div class="logo">SISTEMA C.P.A</div>
+            <div onclick="toggleMenu()" style="cursor:pointer; font-weight:bold; color: var(--primary);">HISTÓRICO ☰</div>
+        </header>
+
+        <main>
+            <div class="card">
+                <h1>ORIENTADOR DE PERCURSO ACADÉMICO</h1>
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; margin-bottom:8px; font-weight:bold; color: white;">Nome Completo do Aluno:</label>
+                    <input type="text" id="nomeEstudante" style="width:100%; padding:14px; border-radius:8px; border:none; font-size:1rem;" placeholder="Digite o nome do estudante">
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Disciplina</th>
+                                <th>8ª Classe</th>
+                                <th>9ª Classe</th>
+                                <th>10ª Classe</th>
+                                <th>Média</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabela"></tbody>
+                    </table>
+                </div>
+
+                <div class="btn-grid">
+                    <button class="btn btn-calc" onclick="calcular()">CALCULAR ORIENTAÇÃO</button>
+                    <button class="btn btn-save" onclick="salvar()">SALVAR REGISTO</button>
+                    <button class="btn btn-pdf" onclick="gerarPDF()">GERAR RELATÓRIO PDF</button>
+                    <button class="btn btn-clear" onclick="limpar()">LIMPAR TUDO</button>
+                </div>
+
+                <div id="resultado">
+                    <h3 id="resNome"></h3>
+                    <div id="resMedias" style="font-size: 1.1rem; margin: 10px 0;"></div>
+                    <h2 id="resFinal" style="color: #2ecc71; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;"></h2>
+                    <div class="chart-container"><canvas id="graficoBarras"></canvas></div>
+                </div>
+            </div>
+        </main>
+        <footer>© 2026 C.A.C.T | Direitos Reservados</footer>
+    </div>
+
+    <script>
+        const disciplinas = [
+            {id: 'Por', nome: 'Português', f8: true}, {id: 'Im', nome: 'Inglês', f8: true},
+            {id: 'Fr', nome: 'Francês', f8: false}, {id: 'M', nome: 'Matemática', f8: true},
+            {id: 'F', nome: 'Física', f8: true}, {id: 'Q', nome: 'Química', f8: true},
+            {id: 'B', nome: 'Biologia', f8: true}, {id: 'G', nome: 'Geografia', f8: true},
+            {id: 'H', nome: 'História', f8: true}, {id: 'EVT', nome: 'Ed. Visual', f8: true}
+        ];
+
+        let bancoDados = JSON.parse(localStorage.getItem('cact_v_final')) || [];
+        let meuGrafico = null;
+
+        function iniciarApp() {
+            document.getElementById('landing-page').style.display = 'none';
+            document.getElementById('sistema-cpa').style.display = 'block';
+            window.scrollTo(0,0);
+        }
+
+        const corpo = document.getElementById('corpoTabela');
+        disciplinas.forEach(d => {
+            const tr = document.createElement('tr');
+            tr.dataset.subj = d.id;
+            tr.innerHTML = `
+                <td style="text-align:left; font-weight:bold;">${d.nome}</td>
+                <td>${d.f8 ? `<input type="number" class="input-nota n8" min="0" max="20" onchange="valida(this)">` : 'N/A'}</td>
+                <td><input type="number" class="input-nota n9" min="0" max="20" onchange="valida(this)"></td>
+                <td><input type="number" class="input-nota n10" min="0" max="20" onchange="valida(this)"></td>
+                <td class="m-cell" style="font-weight:bold; color:var(--accent);">-</td>
+            `;
+            corpo.appendChild(tr);
+        });
+
+        function valida(i) {
+            let v = parseFloat(i.value);
+            if(v < 0 || v > 20) i.value = "";
+            i.classList.toggle('negativa', v < 10 && i.value !== "");
+        }
+
+        function toggleMenu() { 
+            document.getElementById('sideMenu').classList.toggle('active'); 
+            if(document.getElementById('sideMenu').classList.contains('active')) atualizarLista();
+        }
+
+        function calcular() {
+            const nome = document.getElementById('nomeEstudante').value;
+            if(!nome) return alert("Por favor, insira o nome do aluno.");
+
+            let notasResumo = {};
+            let detalheNotas = {};
+
+            document.querySelectorAll('#corpoTabela tr').forEach(tr => {
+                const id = tr.dataset.subj;
+                const v8 = tr.querySelector('.n8')?.value || "";
+                const v9 = tr.querySelector('.n9')?.value || "";
+                const v10 = tr.querySelector('.n10')?.value || "";
+                
+                detalheNotas[id] = {v8, v9, v10};
+                let s=0, q=0;
+                [v8, v9, v10].forEach(v => { if(v!=="") { s+=parseFloat(v); q++; }});
+                let m = q > 0 ? s/q : 0;
+                notasResumo[id] = m;
+                tr.querySelector('.m-cell').innerText = m > 0 ? m.toFixed(1) : "-";
+            });
+
+            const mA = (notasResumo.Por + notasResumo.Im + notasResumo.G + notasResumo.H + (notasResumo.Fr || 0)) / 5;
+            const mB = (notasResumo.M + notasResumo.F + notasResumo.B + notasResumo.Q) / 4;
+            const mC = (notasResumo.M + notasResumo.F + notasResumo.Q + notasResumo.EVT) / 4;
+
+            document.getElementById('resNome').innerText = "Estudante: " + nome;
+            document.getElementById('resMedias').innerText = `Médias - Grupo A: ${mA.toFixed(2)} | Grupo B: ${mB.toFixed(2)} | Grupo C: ${mC.toFixed(2)}`;
+            let rec = (mB > mA && mB > mC) ? "CIÊNCIAS (GRUPO B)" : (mC > mA ? "TÉCNICO (GRUPO C)" : "LETRAS (GRUPO A)");
+            document.getElementById('resFinal').innerText = "RECOMENDAÇÃO FINAL: " + rec;
+            document.getElementById('resultado').style.display = 'block';
+
+            desenharGrafico(mA, mB, mC);
+            return {nome, mA, mB, mC, rec, detalhe: detalheNotas};
+        }
+
+        function desenharGrafico(a, b, c) {
+            const ctx = document.getElementById('graficoBarras').getContext('2d');
+            if(meuGrafico) meuGrafico.destroy();
+            meuGrafico = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Grupo A (Letras)', 'Grupo B (Ciências)', 'Grupo C (Técnico)'],
+                    datasets: [{ data: [a,b,c], backgroundColor: ['#3498db', '#27ae60', '#f1c40f'], borderRadius: 5 }]
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true, max: 20 } }, plugins: { legend: false } }
+            });
+        }
+
+        function salvar() {
+            const data = calcular(); if(!data) return;
+            bancoDados.push({...data, id: Date.now()});
+            localStorage.setItem('cact_v_final', JSON.stringify(bancoDados));
+            alert("Registo salvo!");
+        }
+
+        function atualizarLista() {
+            const lista = document.getElementById('listaDinamica');
+            lista.innerHTML = bancoDados.length ? "" : "<p style='opacity:0.5;'>Vazio.</p>";
+            bancoDados.forEach(aluno => {
+                const item = document.createElement('div');
+                item.className = 'student-item';
+                item.innerHTML = `
+                    <div onclick="carregar(${aluno.id})" style="flex:1;">
+                        <div style="font-weight:bold;">${aluno.nome}</div>
+                        <div style="font-size:0.75rem; color:var(--warning);">${aluno.rec}</div>
+                    </div>
+                    <button class="btn-del-small" onclick="apagarUm(${aluno.id})">X</button>
+                `;
+                lista.appendChild(item);
+            });
+        }
+
+        function carregar(id) {
+            const a = bancoDados.find(x => x.id === id);
+            document.getElementById('nomeEstudante').value = a.nome;
+            document.querySelectorAll('#corpoTabela tr').forEach(tr => {
+                const idS = tr.dataset.subj;
+                const notas = a.detalhe[idS];
+                if(tr.querySelector('.n8')) tr.querySelector('.n8').value = notas.v8;
+                tr.querySelector('.n9').value = notas.v9;
+                tr.querySelector('.n10').value = notas.v10;
+            });
+            calcular(); toggleMenu();
+        }
+
+        function apagarUm(id) {
+            event.stopPropagation();
+            if(confirm("Apagar este aluno?")) {
+                bancoDados = bancoDados.filter(x => x.id !== id);
+                localStorage.setItem('cact_v_final', JSON.stringify(bancoDados));
+                atualizarLista();
+            }
+        }
+
+        function gerarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const nome = document.getElementById('nomeEstudante').value || "Estudante";
+            doc.setFontSize(18);
+            doc.text("C.P.A - Relatório de Orientação Académica", 105, 20, { align: 'center' });
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text("Nome do Aluno: ", 20, 35);
+            doc.setTextColor(52, 152, 219); 
+            doc.text(nome, 55, 35);
+            doc.setTextColor(0, 0, 0);
+            doc.autoTable({
+                startY: 45,
+                head: [['Grupo Académico', 'Média Obtida']],
+                body: [
+                    ['Grupo A (Letras e Ciências Sociais)', document.getElementById('resMedias').innerText.split('|')[0].split(':')[1].trim()],
+                    ['Grupo B (Ciências Naturais e Matemática)', document.getElementById('resMedias').innerText.split('|')[1].split(':')[1].trim()],
+                    ['Grupo C (Área Técnica e Ed. Visual)', document.getElementById('resMedias').innerText.split('|')[2].split(':')[1].trim()],
+                ],
+                headStyles: { fillColor: [22, 184, 119] }
+            });
+            const canvas = document.getElementById('graficoBarras');
+            const imgData = canvas.toDataURL('image/png');
+            doc.addImage(imgData, 'PNG', 35, doc.lastAutoTable.finalY + 15, 140, 75);
+            doc.save(`Relatorio_${nome}.pdf`);
+        }
+
+        function apagarTudo() { if(confirm("Apagar tudo?")) { localStorage.clear(); location.reload(); } }
+        function limpar() { location.reload(); }
+    </script>
+</body>
+</html>

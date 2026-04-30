@@ -2,8 +2,8 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C.P.A - Orientador Académico</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>C.P.A - Classificação Pessoal do Aluno</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -13,81 +13,76 @@
             --primary: #2c3e50;
             --accent: #3498db;
             --bg: #19242e;
-            --white: #724141;
-            --gray: #bdc3c7;
+            --card-bg: #724141;
+            --white: #ffffff;
             --success: #27ae60;
             --warning: #f1c40f;
             --danger: #e74c3c;
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: white; scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; color: white; overflow-x: hidden; }
 
         /* --- LANDING PAGE --- */
         #landing-page {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            min-height: 100vh; text-align: center; padding: 20px;
+            min-height: 100vh; text-align: center; padding: 20px; box-sizing: border-box;
             background: linear-gradient(rgba(25, 36, 46, 0.85), rgba(25, 36, 46, 0.85)), url('https://images.unsplash.com/photo-1523050335392-9bc567597280?auto=format&fit=crop&w=1350&q=80');
             background-size: cover; background-position: center;
         }
-        .hero-title { font-size: 4rem; margin-bottom: 20px; color: var(--accent); font-weight: 800; letter-spacing: 2px; }
-        .hero-subtitle { font-size: 1.4rem; margin-bottom: 40px; max-width: 700px; line-height: 1.6; font-weight: 300; }
-        
+        .hero-title { font-size: clamp(2.5rem, 8vw, 4rem); margin-bottom: 20px; color: var(--accent); font-weight: 800; }
         .btn-start {
-            background: var(--success); color: white; padding: 20px 60px; border-radius: 50px;
-            font-weight: bold; font-size: 1.3rem; border: none; cursor: pointer; transition: 0.3s;
+            background: var(--success); color: white; padding: 18px 50px; border-radius: 50px;
+            font-weight: bold; font-size: 1.2rem; border: none; cursor: pointer; transition: 0.3s;
             box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4); text-transform: uppercase;
         }
-        .btn-start:hover { transform: scale(1.05); background: #2ecc71; }
 
         /* --- SISTEMA --- */
         #sistema-cpa { display: none; }
-        header { background: var(--white); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .logo { font-weight: bold; color: var(--primary); font-size: 1.2rem; }
+        header { background: var(--card-bg); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .logo { font-weight: bold; font-size: 1.1rem; color: var(--primary); }
         
-        .side-menu { position: fixed; right: -320px; top: 0; width: 320px; height: 100%; background: var(--primary); color: white; transition: 0.3s; z-index: 1001; padding-top: 20px; display: flex; flex-direction: column; }
+        /* Menu Lateral */
+        .side-menu { position: fixed; right: -320px; top: 0; width: 300px; height: 100%; background: var(--primary); color: white; transition: 0.3s; z-index: 1001; padding-top: 20px; display: flex; flex-direction: column; }
         .side-menu.active { right: 0; }
-        .close-menu { align-self: flex-end; margin-right: 20px; font-size: 2rem; cursor: pointer; }
-        .menu-content { padding: 20px; overflow-y: auto; flex: 1; }
+        .close-menu { font-size: 2rem; cursor: pointer; padding: 10px 20px; display: block; text-align: right; }
+        .menu-content { padding: 0 20px; flex: 1; overflow-y: auto; }
 
         .student-item { 
             background: rgba(255,255,255,0.05); padding: 12px; margin-bottom: 8px; border-radius: 6px; 
-            display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
         }
         .student-item:hover { background: rgba(255,255,255,0.15); }
-        .btn-del-small { background: var(--danger); border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.7rem; }
+        .btn-del-small { background: var(--danger); border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
 
-        main { padding: 2rem 5%; max-width: 1100px; margin: 0 auto; width: 90%; }
-        .card { background: var(--white); padding: 2.5rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        h1 { text-align: center; color: var(--primary); margin-bottom: 2rem; }
+        /* Tabela Responsiva */
+        .table-container { width: 100%; overflow-x: auto; background: white; border-radius: 8px; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; min-width: 480px; }
+        th, td { border: 1px solid #ddd; padding: 10px 5px; text-align: center; color: #333; }
+        th { background: #16b877; color: white; font-size: 0.8rem; }
+        .input-nota { width: 45px; padding: 8px 2px; text-align: center; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; }
+
+        main { padding: 20px 15px; max-width: 1000px; margin: 0 auto; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 15px; }
         
-        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; background: #fff; color: #333; border-radius: 8px; overflow: hidden; }
-        th, td { border: 1px solid #690e5e; padding: 12px; text-align: center; }
-        th { background: #16b877; color: #fff; }
-        .input-nota { width: 55px; padding: 8px; text-align: center; border: 1px solid var(--gray); border-radius: 4px; font-weight: bold; }
-        .input-nota.negativa { color: var(--danger); background: #fff5f5; }
+        .btn-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+        @media (min-width: 600px) { .btn-grid { grid-template-columns: 1fr 1fr; } }
 
-        .btn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 20px; }
-        .btn { border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; color: white; text-transform: uppercase; font-size: 0.85rem; transition: 0.2s; }
+        .btn { border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; color: white; text-transform: uppercase; }
         .btn-calc { background: var(--accent); }
         .btn-save { background: var(--success); }
         .btn-pdf { background: var(--warning); color: #333; }
         .btn-clear { background: #95a5a6; }
-        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
 
-        #resultado { display: none; margin-top: 30px; padding: 25px; background: #2b506f; border-radius: 12px; border-left: 8px solid var(--accent); }
-        .chart-container { background: white; padding: 20px; border-radius: 10px; margin-top: 20px; }
-        
-        footer { background: var(--primary); text-align: center; padding: 2rem; margin-top: 50px; }
+        #resultado { display: none; margin-top: 20px; padding: 15px; background: #2b506f; border-radius: 10px; border-left: 5px solid var(--accent); }
+        .chart-container { background: white; padding: 10px; border-radius: 8px; margin-top: 15px; }
+        footer { background: var(--primary); text-align: center; padding: 20px; margin-top: 40px; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
     <section id="landing-page">
         <h1 class="hero-title">SISTEMA C.P.A</h1>
-        <p class="hero-subtitle">
-            Plataforma avançada de orientação vocacional inteligente.<br>
-            Analise o desempenho da 8ª, 9ª e 10ª classe para definir o melhor percurso académico.
-        </p>
+        <p style="margin-bottom: 30px; opacity: 0.9;">Classificação Pessoal do Aluno</p>
         <button class="btn-start" onclick="iniciarApp()">ENTRAR NO SISTEMA</button>
     </section>
 
@@ -95,26 +90,25 @@
         <div id="sideMenu" class="side-menu">
             <span class="close-menu" onclick="toggleMenu()">&times;</span>
             <div class="menu-content">
-                <h3 style="border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px;">Histórico de Alunos</h3>
+                <h3 style="border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px;">Histórico</h3>
                 <div id="listaDinamica"></div>
-                <button class="btn" style="background:var(--danger); width:100%; margin-top:30px;" onclick="apagarTudo()">Limpar Tudo</button>
+                <button class="btn" style="background:var(--danger); width:100%; margin-top:30px;" onclick="apagarTudo()">LIMPAR TUDO</button>
             </div>
         </div>
 
         <header>
             <div class="logo">SISTEMA C.P.A</div>
-            <div onclick="toggleMenu()" style="cursor:pointer; font-weight:bold; color: var(--primary);">HISTÓRICO ☰</div>
+            <div onclick="toggleMenu()" style="cursor:pointer; font-size: 1.8rem; color: var(--primary);">☰</div>
         </header>
 
         <main>
             <div class="card">
-                <h1>ORIENTADOR DE PERCURSO ACADÉMICO</h1>
-                <div style="margin-bottom: 20px;">
-                    <label style="display:block; margin-bottom:8px; font-weight:bold; color: white;">Nome Completo do Aluno:</label>
-                    <input type="text" id="nomeEstudante" style="width:100%; padding:14px; border-radius:8px; border:none; font-size:1rem;" placeholder="Digite o nome do estudante">
-                </div>
+                <h1 style="text-align: center;">ORIENTADOR DE PERCURSO</h1>
+                
+                <label style="display:block; margin-bottom:8px; font-weight:bold;">Nome do Aluno:</label>
+                <input type="text" id="nomeEstudante" style="width:100%; padding:14px; border-radius:8px; border:none; margin-bottom:20px; box-sizing:border-box;" placeholder="Nome Completo">
 
-                <div class="table-wrapper">
+                <div class="table-container">
                     <table>
                         <thead>
                             <tr>
@@ -130,21 +124,21 @@
                 </div>
 
                 <div class="btn-grid">
-                    <button class="btn btn-calc" onclick="calcular()">CALCULAR ORIENTAÇÃO</button>
-                    <button class="btn btn-save" onclick="salvar()">SALVAR REGISTO</button>
-                    <button class="btn btn-pdf" onclick="gerarPDF()">GERAR RELATÓRIO PDF</button>
-                    <button class="btn btn-clear" onclick="limpar()">LIMPAR TUDO</button>
+                    <button class="btn btn-calc" onclick="calcular()">CALCULAR</button>
+                    <button class="btn btn-save" onclick="salvar()">SALVAR</button>
+                    <button class="btn btn-pdf" onclick="gerarPDF()">PDF</button>
+                    <button class="btn btn-clear" onclick="limparCampos()">LIMPAR</button>
                 </div>
 
                 <div id="resultado">
-                    <h3 id="resNome"></h3>
-                    <div id="resMedias" style="font-size: 1.1rem; margin: 10px 0;"></div>
+                    <h3 id="resNome" style="margin-top:0"></h3>
+                    <div id="resMedias" style="font-size: 1rem; margin: 10px 0;"></div>
                     <h2 id="resFinal" style="color: #2ecc71; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;"></h2>
                     <div class="chart-container"><canvas id="graficoBarras"></canvas></div>
                 </div>
             </div>
         </main>
-        <footer>© 2026 C.A.C.T | Direitos Reservados</footer>
+        <footer>© 2026 C.A.C.T | Direitos Reservados by Richard</footer>
     </div>
 
     <script>
@@ -156,13 +150,12 @@
             {id: 'H', nome: 'História', f8: true}, {id: 'EVT', nome: 'Ed. Visual', f8: true}
         ];
 
-        let bancoDados = JSON.parse(localStorage.getItem('cact_v_final')) || [];
+        let bancoDados = JSON.parse(localStorage.getItem('cact_cpa_db')) || [];
         let meuGrafico = null;
 
         function iniciarApp() {
             document.getElementById('landing-page').style.display = 'none';
             document.getElementById('sistema-cpa').style.display = 'block';
-            window.scrollTo(0,0);
         }
 
         const corpo = document.getElementById('corpoTabela');
@@ -170,20 +163,16 @@
             const tr = document.createElement('tr');
             tr.dataset.subj = d.id;
             tr.innerHTML = `
-                <td style="text-align:left; font-weight:bold;">${d.nome}</td>
-                <td>${d.f8 ? `<input type="number" class="input-nota n8" min="0" max="20" onchange="valida(this)">` : 'N/A'}</td>
-                <td><input type="number" class="input-nota n9" min="0" max="20" onchange="valida(this)"></td>
-                <td><input type="number" class="input-nota n10" min="0" max="20" onchange="valida(this)"></td>
-                <td class="m-cell" style="font-weight:bold; color:var(--accent);">-</td>
+                <td style="text-align:left; font-weight:bold; padding-left: 10px;">${d.nome}</td>
+                <td>${d.f8 ? `<input type="number" class="input-nota n8" onchange="v(this)">` : 'N/A'}</td>
+                <td><input type="number" class="input-nota n9" onchange="v(this)"></td>
+                <td><input type="number" class="input-nota n10" onchange="v(this)"></td>
+                <td class="m-cell" style="font-weight:bold;">—</td>
             `;
             corpo.appendChild(tr);
         });
 
-        function valida(i) {
-            let v = parseFloat(i.value);
-            if(v < 0 || v > 20) i.value = "";
-            i.classList.toggle('negativa', v < 10 && i.value !== "");
-        }
+        function v(i) { if(i.value < 0 || i.value > 20) i.value = ""; i.style.color = i.value < 10 ? "red" : "green"; }
 
         function toggleMenu() { 
             document.getElementById('sideMenu').classList.toggle('active'); 
@@ -192,23 +181,23 @@
 
         function calcular() {
             const nome = document.getElementById('nomeEstudante').value;
-            if(!nome) return alert("Por favor, insira o nome do aluno.");
+            if(!nome) return alert("Insira o nome do aluno!");
 
             let notasResumo = {};
-            let detalheNotas = {};
+            let detalhe = {};
 
             document.querySelectorAll('#corpoTabela tr').forEach(tr => {
                 const id = tr.dataset.subj;
                 const v8 = tr.querySelector('.n8')?.value || "";
                 const v9 = tr.querySelector('.n9')?.value || "";
                 const v10 = tr.querySelector('.n10')?.value || "";
+                detalhe[id] = {v8, v9, v10};
                 
-                detalheNotas[id] = {v8, v9, v10};
                 let s=0, q=0;
                 [v8, v9, v10].forEach(v => { if(v!=="") { s+=parseFloat(v); q++; }});
                 let m = q > 0 ? s/q : 0;
                 notasResumo[id] = m;
-                tr.querySelector('.m-cell').innerText = m > 0 ? m.toFixed(1) : "-";
+                tr.querySelector('.m-cell').innerText = m > 0 ? m.toFixed(1) : "—";
             });
 
             const mA = (notasResumo.Por + notasResumo.Im + notasResumo.G + notasResumo.H + (notasResumo.Fr || 0)) / 5;
@@ -216,13 +205,13 @@
             const mC = (notasResumo.M + notasResumo.F + notasResumo.Q + notasResumo.EVT) / 4;
 
             document.getElementById('resNome').innerText = "Estudante: " + nome;
-            document.getElementById('resMedias').innerText = `Médias - Grupo A: ${mA.toFixed(2)} | Grupo B: ${mB.toFixed(2)} | Grupo C: ${mC.toFixed(2)}`;
-            let rec = (mB > mA && mB > mC) ? "CIÊNCIAS (GRUPO B)" : (mC > mA ? "TÉCNICO (GRUPO C)" : "LETRAS (GRUPO A)");
-            document.getElementById('resFinal').innerText = "RECOMENDAÇÃO FINAL: " + rec;
+            document.getElementById('resMedias').innerHTML = `Grupo A: ${mA.toFixed(2)} | Grupo B: ${mB.toFixed(2)} | Grupo C: ${mC.toFixed(2)}`;
+            let r = (mB > mA && mB > mC) ? "CIÊNCIAS (B)" : (mC > mA ? "TÉCNICO (C)" : "LETRAS (A)");
+            document.getElementById('resFinal').innerText = "RECOMENDAÇÃO: " + r;
             document.getElementById('resultado').style.display = 'block';
 
             desenharGrafico(mA, mB, mC);
-            return {nome, mA, mB, mC, rec, detalhe: detalheNotas};
+            return {nome, mA, mB, mC, r, detalhe};
         }
 
         function desenharGrafico(a, b, c) {
@@ -231,35 +220,28 @@
             meuGrafico = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Grupo A (Letras)', 'Grupo B (Ciências)', 'Grupo C (Técnico)'],
-                    datasets: [{ data: [a,b,c], backgroundColor: ['#3498db', '#27ae60', '#f1c40f'], borderRadius: 5 }]
+                    labels: ['G. Letras (A)', 'G. Ciências (B)', 'G. Técnico (C)'],
+                    datasets: [{ data: [a,b,c], backgroundColor: ['#3498db', '#27ae60', '#f1c40f'] }]
                 },
-                options: { responsive: true, scales: { y: { beginAtZero: true, max: 20 } }, plugins: { legend: false } }
+                options: { scales: { y: { beginAtZero: true, max: 20 } }, plugins: { legend: false } }
             });
         }
 
         function salvar() {
-            const data = calcular(); if(!data) return;
-            bancoDados.push({...data, id: Date.now()});
-            localStorage.setItem('cact_v_final', JSON.stringify(bancoDados));
-            alert("Registo salvo!");
+            const d = calcular(); if(!d) return;
+            bancoDados.push({...d, id: Date.now()});
+            localStorage.setItem('cact_cpa_db', JSON.stringify(bancoDados));
+            alert("Dados salvos no histórico!");
         }
 
         function atualizarLista() {
             const lista = document.getElementById('listaDinamica');
-            lista.innerHTML = bancoDados.length ? "" : "<p style='opacity:0.5;'>Vazio.</p>";
-            bancoDados.forEach(aluno => {
-                const item = document.createElement('div');
-                item.className = 'student-item';
-                item.innerHTML = `
-                    <div onclick="carregar(${aluno.id})" style="flex:1;">
-                        <div style="font-weight:bold;">${aluno.nome}</div>
-                        <div style="font-size:0.75rem; color:var(--warning);">${aluno.rec}</div>
-                    </div>
-                    <button class="btn-del-small" onclick="apagarUm(${aluno.id})">X</button>
-                `;
-                lista.appendChild(item);
-            });
+            lista.innerHTML = bancoDados.map(a => `
+                <div class="student-item">
+                    <div onclick="carregar(${a.id})" style="flex:1;"><b>${a.nome}</b><br><small>${a.r}</small></div>
+                    <button class="btn-del-small" onclick="apagarUm(${a.id})">X</button>
+                </div>
+            `).join('');
         }
 
         function carregar(id) {
@@ -267,53 +249,52 @@
             document.getElementById('nomeEstudante').value = a.nome;
             document.querySelectorAll('#corpoTabela tr').forEach(tr => {
                 const idS = tr.dataset.subj;
-                const notas = a.detalhe[idS];
-                if(tr.querySelector('.n8')) tr.querySelector('.n8').value = notas.v8;
-                tr.querySelector('.n9').value = notas.v9;
-                tr.querySelector('.n10').value = notas.v10;
+                const n = a.detalhe[idS];
+                if(tr.querySelector('.n8')) tr.querySelector('.n8').value = n.v8;
+                tr.querySelector('.n9').value = n.v9;
+                tr.querySelector('.n10').value = n.v10;
             });
             calcular(); toggleMenu();
         }
 
         function apagarUm(id) {
-            event.stopPropagation();
-            if(confirm("Apagar este aluno?")) {
+            if(confirm("Eliminar este aluno?")) {
                 bancoDados = bancoDados.filter(x => x.id !== id);
-                localStorage.setItem('cact_v_final', JSON.stringify(bancoDados));
+                localStorage.setItem('cact_cpa_db', JSON.stringify(bancoDados));
                 atualizarLista();
             }
+        }
+
+        function limparCampos() {
+            document.getElementById('nomeEstudante').value = "";
+            document.querySelectorAll('.input-nota').forEach(i => i.value = "");
+            document.querySelectorAll('.m-cell').forEach(c => c.innerText = "—");
+            document.getElementById('resultado').style.display = 'none';
         }
 
         function gerarPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            const nome = document.getElementById('nomeEstudante').value || "Estudante";
-            doc.setFontSize(18);
-            doc.text("C.P.A - Relatório de Orientação Académica", 105, 20, { align: 'center' });
-            doc.setFontSize(12);
-            doc.setTextColor(0, 0, 0);
-            doc.text("Nome do Aluno: ", 20, 35);
-            doc.setTextColor(52, 152, 219); 
-            doc.text(nome, 55, 35);
-            doc.setTextColor(0, 0, 0);
+            const nome = document.getElementById('nomeEstudante').value || "Aluno";
+            doc.setFontSize(18); doc.text("Relatório de Orientação C.P.A", 105, 20, {align:'center'});
+            doc.setFontSize(12); doc.setTextColor(0,0,0); doc.text("Nome do Aluno: ", 20, 35);
+            doc.setTextColor(52, 152, 219); doc.text(nome, 55, 35);
+            doc.setTextColor(0);
             doc.autoTable({
                 startY: 45,
-                head: [['Grupo Académico', 'Média Obtida']],
+                head: [['Grupo Académico', 'Média']],
                 body: [
-                    ['Grupo A (Letras e Ciências Sociais)', document.getElementById('resMedias').innerText.split('|')[0].split(':')[1].trim()],
-                    ['Grupo B (Ciências Naturais e Matemática)', document.getElementById('resMedias').innerText.split('|')[1].split(':')[1].trim()],
-                    ['Grupo C (Área Técnica e Ed. Visual)', document.getElementById('resMedias').innerText.split('|')[2].split(':')[1].trim()],
+                    ['Grupo A (Letras)', document.getElementById('resMedias').innerText.split('|')[0].split(':')[1].trim()],
+                    ['Grupo B (Ciências)', document.getElementById('resMedias').innerText.split('|')[1].split(':')[1].trim()],
+                    ['Grupo C (Técnico)', document.getElementById('resMedias').innerText.split('|')[2].split(':')[1].trim()],
                 ],
                 headStyles: { fillColor: [22, 184, 119] }
             });
-            const canvas = document.getElementById('graficoBarras');
-            const imgData = canvas.toDataURL('image/png');
-            doc.addImage(imgData, 'PNG', 35, doc.lastAutoTable.finalY + 15, 140, 75);
-            doc.save(`Relatorio_${nome}.pdf`);
+            doc.addImage(document.getElementById('graficoBarras').toDataURL(), 'PNG', 30, doc.lastAutoTable.finalY + 15, 140, 75);
+            doc.save(`Relatorio_CPA_${nome}.pdf`);
         }
 
-        function apagarTudo() { if(confirm("Apagar tudo?")) { localStorage.clear(); location.reload(); } }
-        function limpar() { location.reload(); }
+        function apagarTudo() { if(confirm("Apagar TODO o histórico?")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>

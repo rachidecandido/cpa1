@@ -7,6 +7,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a73e8">
     
     <style>
         :root {
@@ -295,6 +297,11 @@
         }
 
         function apagarTudo() { if(confirm("Apagar TODO o histórico?")) { localStorage.clear(); location.reload(); } }
+    </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js');
+  }
     </script>
 </body>
 </html>
